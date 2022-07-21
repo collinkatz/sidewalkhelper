@@ -8,7 +8,7 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 
 ## Requirements
 - geopandas
-- contextily
+- gmplot
 
 ### TODO
 - [x] Figure out epsg number for correct transform
