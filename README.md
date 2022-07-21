@@ -14,3 +14,4 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 - [ ] Convert linestring to set of connected points : i.e. form graph
 - [ ] Define how separate linestrings connect : Maybe look at intersect or point proximity to determine path connections
 - [ ] Choose search algorithm to operate on graph
+$$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $$
