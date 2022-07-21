@@ -6,6 +6,10 @@ The goal of this project is to utilize sidewalk GIS data from the Howard County 
 ## Project Description
 Using GIS data in .shp files, we build a graph representation of all the datapoints and use these to deretmine reasonable connections between sidewalk paths in the county. We then use a graph search algorithm to determine if there is a sidewalk connection between two points on the graph.
 
+## Requirements
+- geopandas
+- contextily
+
 ### TODO
 - [x] Figure out epsg number for correct transform
 - [ ] Get plot() function to display output
