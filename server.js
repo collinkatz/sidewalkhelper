@@ -1,9 +1,19 @@
+// Imports
 const express = require('express')
+const expressLayouts = require('express-ejs-layouts')
+
+// Start up app
 const app = express()
 const port = 3000
 
+// Set view engine to load pages
+app.use(expressLayouts)
+// app.set('views', './views');
+app.set('view engine', 'ejs')
+
+// Page listeners
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.render('index.ejs')
 })
 
 app.listen(port, () => {
