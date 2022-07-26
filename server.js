@@ -8,7 +8,7 @@ const port = 3000
 
 // Set view engine to load pages
 app.use(expressLayouts)
-// app.set('views', './views');
+app.set('views', './src/views');
 app.set('view engine', 'ejs')
 
 // Page listeners
