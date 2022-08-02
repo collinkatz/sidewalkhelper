@@ -10,6 +10,7 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 ### Python
 - geopandas
 - gmplot
+- json
 ### JavaScript
 - Node
 - express
