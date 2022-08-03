@@ -8,10 +8,16 @@
 
     <script async defer type='text/javascript' src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0cOIe_weOSpK9emVB4Hsa0WKmH6ZIlEo&callback=initMap"></script>
     <script type='text/javascript' src="/js/maphandler.js"></script>
+    <script async>
+        var county = 'howard_county' // TODO: Make this update based on user location
+        async function pageSetup() {
+            initMap(county)
+        }
+    </script>
 
     <title>Document</title>
 </head>
-<body onload="initMap()">
+<body onload="pageSetup()">
     <header>This is my cool map</header>
     <div id="map"></div>
 </body>
