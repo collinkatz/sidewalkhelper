@@ -3,6 +3,9 @@ const express = require('express');
 // const expressLayouts = require('express-ejs-layouts');
 const { spawn } = require('node:child_process');
 
+// Variables
+var queryCount = 0;
+
 // Start up app
 const app = express();
 const port = 3000;
@@ -21,6 +24,20 @@ app.get('/', (req, res) => {
   res.render('index', {title: 'Map', layout: ''});
 });
 
+app.get('/queryCountyData', (req, res) => {
+  queryCount++;
+  myQID = queryCount;
+  myCounty = req.query.county;
+  var process = spawn('python', ['./dataQuery.py', myQID, req.query.northEast, req.query.southWest, myCounty]);
+  process.stdout.on('data', function(data) {
+    if (data.startsWith('query: ' + myQID)) {
+      var myGeoJSONFile = require('./query_output/' + myQID + '_' + myCounty + '.json');
+      res.json(myGeoJSONFile);
+    }
+  });
+});
+
+// Start listening
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
