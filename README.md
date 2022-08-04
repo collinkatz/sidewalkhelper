@@ -15,7 +15,6 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 - Node
 - express
 - ejs
-- express-ejs-layouts
 
 ### TODO
 - [x] Figure out epsg number for correct transform
