@@ -49,10 +49,12 @@ class SHPQuery:
 if __name__ == "__main__":
     args = sys.argv
     try:
-        qid = args[1]
-        ne = json.loads(args[2])
-        sw = json.loads(args[3])
-        county = args[4]
+        qid = args[0]
+        ne = json.load(open(args[1], "r"))
+        sw = json.load(open(args[2], "r"))
+        county = args[3]
+        # TODO: Check that boundcoords are not null
+        # print("python query: " + qid + ne + sw + county)
         SHPQuery(qid, county, {'x1': ne["lng"], 'y1': ne["lat"], 'x2': sw["lng"], 'y2': sw["lat"]}, maps_crs)
     except IndexError:
         print("Not enough arguments")
