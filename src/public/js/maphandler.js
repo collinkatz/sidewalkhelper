@@ -12,16 +12,14 @@ async function initMap(county) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                "ne": bounds["ne"],
-                "sw": bounds["sw"],
+                "bounds": bounds,
                 "county": county
             })
         });
         console.log(response)
-        var responseGeoJSON = await response.json()
+        var responseGeoJSON = await response.json();
         console.log(responseGeoJSON)
-        map.data.loadGeoJson(responseGeoJSON) // TODO: Needs rejected promise handling??
-        console.log(fromServer)
+        map.data.addGeoJson(responseGeoJSON) // TODO: Needs rejected promise handling??
     });
     async function mapBounds() {
         northEast = map.getBounds().getNorthEast()
