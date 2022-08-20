@@ -1,6 +1,7 @@
 // Imports
 const express = require('express');
-const { spawn } = require('node:child_process');
+const { spawn, exec, execFile } = require('node:child_process');
+const path = require('node:path');
 
 // Variables
 var queryCount = 0;
@@ -23,19 +24,21 @@ app.get('/', (req, res) => {
 });
 
 app.post('/queryCountyData', (req, res) => {
-  console.log(req.body)
   queryCount++;
   myQID = queryCount;
-  ne = req.body['ne'];
-  sw = req.body['sw'];
+  bounds = JSON.stringify(req.body['bounds']).replaceAll('\"', "\'"); // Need to replace double quotes with single for command line input
   county = req.body['county'];
-  var process = spawn('python3', ['./dataQuery.py', myQID, ne, sw, county]);
+
+  var process = spawn('python', ['./dataQuery.py', myQID, bounds, county], {shell: true});
   console.log("spawned process")
-  process.stderr.pipe(process.stderr);
-  process.stdout.on('data', function(data) {
-    var myGeoJSONFile = require('./query_output/' + myQID + '_' + county + '.json');
-    res.json(myGeoJSONFile);
-    console.log(myGeoJSONFile)
+  process.stderr.on('data', (data) => {
+    console.log(String(data))
+  });
+  process.stdout.on('data', (data) => {
+    console.log(String(data))
+    var myGeoJSONFile = './query_output/' + myQID + '_' + county + '.json';
+    res.sendFile(myGeoJSONFile, {root: path.join(__dirname)});
+    console.log(myGeoJSONFile);
   });
 });
 
