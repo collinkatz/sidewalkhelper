@@ -5,19 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/main.css">
-
+    <script type='text/javascript' src="/js/maphandler.js"></script>
     <script async defer type='text/javascript' src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0cOIe_weOSpK9emVB4Hsa0WKmH6ZIlEo"></script> <!--&callback=pageSetup-->
-    <script async type='text/javascript' src="/js/maphandler.js"></script>
     <script async>
         var county = 'howard_county' // TODO: Make this update based on user location
-        async function pageSetup() {
-            initMap(county)
-        }
     </script>
 
     <title>Document</title>
 </head>
-<body onload="pageSetup()">
+<body onload="initMap(county)">
     <header>This is my cool map</header>
     <div id="map"></div>
 </body>
