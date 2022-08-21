@@ -1,12 +1,19 @@
-async function initMap(county) {
+async function initMap(county) { // Setup map and event listeners
+
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 39.29360, lng: -76.81646 }, // TODO: need to change these to update based on user location
         zoom: 16,
     });
-    google.maps.event.addListenerOnce(map, "idle", async function () {
-        var bounds = await mapBounds()
-        console.log("ne: (lat: " + bounds["ne"]["lat"] + ", lng: " + bounds["ne"]["lng"] + ") sw: (lat: " + bounds["sw"]["lat"] + ", lng: " + bounds["sw"]["lng"] + ")")
-        var response = await fetch("/queryCountyData", {
+
+    var features = {};
+
+    google.maps.event.addListener(map, "idle", debounce(() => mapQuery(map))) // Add listener for when map idles on page
+
+    async function mapQuery(mapObj) {
+        clearFeatures(features);
+        var bounds = await mapBounds(mapObj)
+        console.log("Query--- ne: (lat: " + bounds["ne"]["lat"] + ", lng: " + bounds["ne"]["lng"] + ") sw: (lat: " + bounds["sw"]["lat"] + ", lng: " + bounds["sw"]["lng"] + ")")
+        fetch("/queryCountyData", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -15,15 +22,38 @@ async function initMap(county) {
                 "bounds": bounds,
                 "county": county
             })
+        }).then((response) => {
+            console.log(response)
+            response.json().then((responseGeoJSON) => {
+                console.log(responseGeoJSON)
+                features = mapObj.data.addGeoJson(responseGeoJSON)
+            });
+        }, (err) => { // TODO: needs better message if promise is just canceled it's not an error
+            console.log("error: " + err)
         });
-        console.log(response)
-        var responseGeoJSON = await response.json();
-        console.log(responseGeoJSON)
-        map.data.addGeoJson(responseGeoJSON) // TODO: Needs rejected promise handling??
-    });
-    async function mapBounds() {
-        northEast = map.getBounds().getNorthEast()
-        southWest =  map.getBounds().getSouthWest()
+    }
+
+    function debounce(func, timeout = 1000){
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+      
+
+    function clearFeatures(features) {
+        if (features.length != 0) {
+            for (var i = 0; i < features.length; i++) {
+                map.data.remove(features[i]);
+            }
+        }
+    }
+
+    async function mapBounds(mapObj) {
+        northEast = mapObj.getBounds().getNorthEast()
+        southWest =  mapObj.getBounds().getSouthWest()
         return {"ne": {"lat": northEast.lat(), "lng": northEast.lng()},"sw": {"lat": southWest.lat(), "lng": southWest.lng()}}
     }
+
 }
