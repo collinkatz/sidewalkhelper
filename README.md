@@ -13,7 +13,10 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 - json
 ### JavaScript
 - Node
+<!-- - socket.io -->
+<!-- - socket.io-client -->
 - express
+- express-ws
 - ejs
 
 ### TODO
