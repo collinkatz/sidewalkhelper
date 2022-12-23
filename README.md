@@ -21,8 +21,8 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 
 ### TODO
 - [x] Figure out epsg number for correct transform
-- [ ] Get plot() function to display output
-- [ ] Get sattellite image background on plot
+- [ ] Work out websocket messages for map updates
+- [ ] Remove file-io from query procedure
 - [ ] Set up class heirarchy for graph : line-point-connections
 - [ ] Convert linestring to set of connected points : i.e. form graph
 - [ ] Define how separate linestrings connect : Maybe look at intersect or point proximity to determine path connections
