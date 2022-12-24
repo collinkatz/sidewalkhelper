@@ -11,7 +11,7 @@ async function initMap(county) { // Setup map and event listeners
 
 }
 
-/* Old Map Query
+/* Old Map Query using POST
 async function mapQuery(mapObj, bounded) {
     var bounds = {};
     if (bounded) {
@@ -46,11 +46,7 @@ const mapwsSocketUrl = 'ws://localhost:3000/mapws/'
 const socket = new WebSocket(mapwsSocketUrl);
 
 socket.onopen = () => {
-  socket.send('Here\'s some text that the server is urgently awaiting!'); 
-}
-
-socket.onmessage = e => {
-  console.log('Message from server:', event.data)
+  console.log('Websocket Opened'); 
 }
 
 async function mapQuery(mapObj, bounded) {
@@ -67,6 +63,13 @@ async function mapQuery(mapObj, bounded) {
         "bounds": bounds,
         "county": county
     }))
+
+    socket.onmessage = (message) => {
+        console.log('Message from server:', message.data)
+        var responseGeoJSON = JSON.parse(message.data);
+        console.log(responseGeoJSON)
+        features = mapObj.data.addGeoJson(responseGeoJSON)
+    }
 }
 
 
