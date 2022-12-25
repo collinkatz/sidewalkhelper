@@ -21,7 +21,7 @@ Using GIS data in .shp files, we build a graph representation of all the datapoi
 
 ### TODO
 - [x] Figure out epsg number for correct transform
-- [ ] Work out websocket messages for map updates
+- [x] Work out websocket messages for map updates
 - [ ] Remove file-io from query procedure
 - [ ] Set up class heirarchy for graph : line-point-connections
 - [ ] Convert linestring to set of connected points : i.e. form graph
