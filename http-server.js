@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
   
 });
 
-app.post('/queryCountyData', (req, res) => {
+app.post('/queryCountyData', (req, res) => { // Depricated
 
   // Parse request and update query count
   queryCount++;
