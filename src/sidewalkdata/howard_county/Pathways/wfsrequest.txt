@@ -1,0 +1,1 @@
+https://data.howardcountymd.gov/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=general:Pathways&outputFormat=shape-zip
