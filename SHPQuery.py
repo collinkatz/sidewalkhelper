@@ -29,9 +29,9 @@ class SHPQuery:
             self.bounding_box = self.bounding_box.to_crs(self.county_data_crs)
             # print(self.bounding_box)
             self.df = self.get_county_data().to_crs(crs)
-            # print(self.df)
-            self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
-            print("query: " + query_id + "_" + county + " finished with status 0")
+            print(self.df.to_json())
+            # self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
+            # print("query: " + query_id + "_" + county + " finished with status 0")
         except:
             print("query: " + query_id + "_" + county + " exited with status -1")
 
