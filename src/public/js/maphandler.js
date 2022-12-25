@@ -1,13 +1,16 @@
 var features = {};
+var mapObj;
 
 async function initMap(county) { // Setup map and event listeners
 
     map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 39.29360, lng: -76.81646 }, // TODO: need to change these to update based on user location
+        // center: { lat: 39.29360, lng: -76.81646 }, // TODO: need to change these to update based on user location
+        center: {lat: 39.199854076400115, lng: -76.77877049068805},
         zoom: 16,
     });
 
-    google.maps.event.addListener(map, "idle", debounce(() => mapQuery(map, true))) // Add listener for when map idles on page
+    mapObj = map;
+    google.maps.event.addListener(map, "idle", debounce(() => mapQuery(true))) // Add listener for when map idles on page
 
 }
 
@@ -49,7 +52,14 @@ socket.onopen = () => {
   console.log('Websocket Opened'); 
 }
 
-async function mapQuery(mapObj, bounded) {
+socket.onmessage = (message) => {
+    console.log('Message from server:', message.data)
+    var responseGeoJSON = JSON.parse(message.data);
+    console.log(responseGeoJSON);
+    features = mapObj.data.addGeoJson(responseGeoJSON);
+}
+
+async function mapQuery(bounded) {
     var bounds = {};
     if (bounded) {
         bounds = await mapBounds(mapObj)
@@ -63,17 +73,10 @@ async function mapQuery(mapObj, bounded) {
         "bounds": bounds,
         "county": county
     }))
-
-    socket.onmessage = (message) => {
-        console.log('Message from server:', message.data)
-        var responseGeoJSON = JSON.parse(message.data);
-        console.log(responseGeoJSON)
-        features = mapObj.data.addGeoJson(responseGeoJSON)
-    }
 }
 
 
-function debounce(func, timeout = 1000){
+function debounce(func, timeout = 100){
     let timer;
     return (...args) => {
         clearTimeout(timer);
