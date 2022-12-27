@@ -1,5 +1,6 @@
 const app = require("./http-server").app;
 const port = require("./http-server").port;
+const { time } = require("console");
 const expressWs = require('express-ws');
 const fs = require('fs');
 
@@ -11,6 +12,7 @@ expressWs(app)
 
 // Variables
 var queryCount = 0;
+const chunksEnabled = false;
 
 app.ws('/mapws', (ws, req) => {
   ws.on('connect', () => {
@@ -32,33 +34,27 @@ app.ws('/mapws', (ws, req) => {
       county = msg['county'];
       queryCount++;
       myQID = queryCount;
-      //TODO cancel process if new query comes in
-      // Spawn python subprocess to make queried file
-      var process = exec(`python ./dataQuery.py ${myQID} ${bounds} ${county}`, (error, stdout, stderr) => {
-        ws.send(stdout);
-      });
-      // console.log("spawned process")
-      // process.stderr.on('data', (data) => { // Outputs errors to command line
-      //   console.log(String(data))
-      // });
-
-      // When process outputs send file and then remove queried json
-      // process.stdout.on('data', (data) => { // Called when python query outputs exit status
-      //   console.log(String(data))
-      //   var myGeoJSONFile = './query_output/' + myQID + '_' + county + '.json';
-      //   var geoJSONData = fs.readFileSync(myGeoJSONFile, 'utf8');
-      //   // JSON.parse(rawdata);
-      //   // ERROR HERE need to use ws.emit instead of res.sendFile
-      //   ws.send(geoJSONData);
-      //   // res.on('finish', () => { // Finish used to delete file after successfully sending
-      //   //   try {
-      //   //     unlink(myGeoJSONFile, () => {console.log("Deleted query json")}); 
-      //   //   } catch(e) {
-      //   //     console.log("error removing ", myGeoJSONFile);
-      //   //   }
-      //   // });
-      //   // console.log(myGeoJSONFile);
-      // });
+      
+      if (chunksEnabled) {
+        var chunkingProcess = exec(`python ./dataQuery.py getChunks ${bounds}`, (error, stdout, stderr) => {
+          var chunks = JSON.parse(stdout);
+          // TODO cancel process if new query comes in
+          // Spawn python subprocess to make queried file
+          // console.log(`python ./dataQuery.py ${myQID} ${bounds} ${county}`);
+          chunks.forEach((currChunk) => {
+            console.log(currChunk);
+            currChunk = JSON.stringify(currChunk).replaceAll('\"', "\'")
+            var queryProcess = exec(`python ./dataQuery.py ${myQID} ${currChunk} ${county}`, (error, stdout, stderr) => {
+              // console.log(stdout);
+              ws.send(stdout);
+            });
+          })
+        });
+      } else {
+        var queryProcess = exec(`python ./dataQuery.py ${myQID} ${bounds} ${county}`, (error, stdout, stderr) => {
+          ws.send(stdout);
+        });
+      }
     } catch(e) {
       console.log(e);
     }
