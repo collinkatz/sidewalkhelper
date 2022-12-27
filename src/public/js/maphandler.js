@@ -46,13 +46,13 @@ async function mapQuery(mapObj, bounded) {
 */
 
 const mapwsSocketUrl = 'ws://localhost:3000/mapws/'
-const socket = new WebSocket(mapwsSocketUrl);
+const mapSocket = new WebSocket(mapwsSocketUrl);
 
-socket.onopen = () => {
+mapSocket.onopen = () => {
   console.log('Websocket Opened'); 
 }
 
-socket.onmessage = (message) => {
+mapSocket.onmessage = (message) => {
     console.log('Message from server:', message.data)
     var responseGeoJSON = JSON.parse(message.data);
     console.log(responseGeoJSON);
@@ -69,7 +69,7 @@ async function mapQuery(bounded) {
     }
     clearFeatures(features);
 
-    socket.send(JSON.stringify({
+    mapSocket.send(JSON.stringify({
         "bounds": bounds,
         "county": county
     }))
