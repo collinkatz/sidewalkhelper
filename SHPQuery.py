@@ -1,4 +1,5 @@
 import json
+import sys
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
@@ -17,23 +18,25 @@ class SHPQuery:
         :param bound_coords: The North-East and South-West coordinates of a bounding box to query data within
         :param crs: The preferred coordinate reference system id for the data to be returned in E.G. "epsg:4326"
         """
-        try:
-            self.bounding_box = gpd.GeoDataFrame({'geometry':[Point(bound_coords['ne']['lng'], bound_coords['ne']['lat']), Point(bound_coords['sw']['lng'], bound_coords['sw']['lat'])]}, index=["p1", "p2"], crs={"init":crs})
-            # TODO: check if county exists in json and has data files - output error if not
-            ctf_file_obj = open(county_to_file, 'r')
-            self.file_names = json.load(ctf_file_obj)[county]
-            ctf_file_obj.close()
-            self.county_directory = sidewalk_data_dir + county + "/"
-            self.county_data_crs = self.get_crs_from_file(self.file_names[0])
-            # print(self.county_data_crs)
-            self.bounding_box = self.bounding_box.to_crs(self.county_data_crs)
-            # print(self.bounding_box)
-            self.df = self.get_county_data().to_crs(crs)
-            print(self.df.to_json())
-            # self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
-            # print("query: " + query_id + "_" + county + " finished with status 0")
-        except:
-            print("query: " + query_id + "_" + county + " exited with status -1")
+        # try:
+        self.bounding_box = gpd.GeoDataFrame({'geometry':[Point(bound_coords['ne']['lng'], bound_coords['ne']['lat']), Point(bound_coords['sw']['lng'], bound_coords['sw']['lat'])]}, index=["p1", "p2"], crs={"init":crs})
+        # TODO: check if county exists in json and has data files - output error if not
+        ctf_file_obj = open(county_to_file, 'r')
+        self.file_names = json.load(ctf_file_obj)[county]
+        ctf_file_obj.close()
+        self.county_directory = sidewalk_data_dir + county + "/"
+        self.county_data_crs = self.get_crs_from_file(self.file_names[0])
+        # print(self.county_data_crs)
+        self.bounding_box = self.bounding_box.to_crs(self.county_data_crs)
+        # print(self.bounding_box)
+        self.df = self.get_county_data().to_crs(crs)
+        # TODO: Need to try to get around stdout limit
+        sys.stdout.write(self.df.to_json()) # Write this to a stream like stdout
+        # self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
+        # print("query: " + query_id + "_" + county + " finished with status 0")
+        # except:
+            
+        #     print("query: " + query_id + "_" + county + " exited with status -1")
 
     def get_crs_from_file(self, file_name):
         temp_df = gpd.read_file(self.county_directory + file_name, rows=1)
