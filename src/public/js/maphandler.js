@@ -56,6 +56,21 @@ mapSocket.onmessage = (message) => {
         var responseGeoJSON = JSON.parse(message.data);
         console.log(responseGeoJSON);
         features = mapObj.data.addGeoJson(responseGeoJSON);
+
+        mapObj.data.setStyle((feature) => {
+            var FEATURE = feature.getProperty('FEATURE');
+            var color = "gray";
+            if (FEATURE == "sidewalks_minor") {
+                color = "blue";
+            } else if (FEATURE == "TrailsLine") {
+                color = "green";
+            }
+            return {
+                strokeColor: color,
+                fillColor: color,
+                strokeWeight: 2
+            }
+        });
     } catch (e) {
         if (e instanceof SyntaxError) {
             console.log(e);
