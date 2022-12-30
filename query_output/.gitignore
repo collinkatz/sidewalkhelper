@@ -1,4 +1,5 @@
 # Ignore everything in this directory
+# This folder is deprecated anyways
 *
 # Except this file
 !.gitignore
