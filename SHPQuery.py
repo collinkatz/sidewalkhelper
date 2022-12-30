@@ -1,9 +1,9 @@
 import json
 import sys
+import time
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
-
 
 sidewalk_data_dir = "./src/sidewalkdata/"
 county_to_file = sidewalk_data_dir + "which_county_files.json"
@@ -31,7 +31,8 @@ class SHPQuery:
         # print(self.bounding_box)
         self.df = self.get_county_data().to_crs(crs)
         # TODO: Need to try to get around stdout limit
-        sys.stdout.write(self.df.to_json()) # Write this to a stream like stdout
+        # TODO: Make it so there is a max query size and it will fill in more as it goes
+        sys.stdout.write(self.df.to_json().replace(' ','')) # Write this to a stream like stdout
         # self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
         # print("query: " + query_id + "_" + county + " finished with status 0")
         # except:
