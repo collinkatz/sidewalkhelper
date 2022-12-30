@@ -8,15 +8,17 @@ maps_crs = "epsg:4326"
 
 args = sys.argv
 try:
-    if len(args) == 4:
-        qid = args[1]
+    qid = args[1]
+    county = args[3]
+    chunks_enabled = args[4] == "true"
+
+    if len(args) == 5 and chunks_enabled == False:
         bounds = json.loads(args[2].replace("'", "\"")) # Need to take single quotes and turn them into double quotes for json.loads
-        county = args[3]
         # TODO: Check that boundcoords are not null
         # print("python query: " + qid + str(bounds["ne"]) + str(bounds["sw"]) + county)
         SHPQuery(qid, county, bounds, maps_crs)
-    elif len(args) == 3 and args[1] == "getChunks":
-        num_chunks = 5
+    elif len(args) == 5 and chunks_enabled == True:
+        num_chunks = 3
         bounds = json.loads(args[2].replace("'", "\"")) # Need to take single quotes and turn them into double quotes for json.loads
         bounds_lng = np.linspace(bounds['sw']['lng'], bounds['ne']['lng'], num_chunks) #bound_coords['ne']['lng']
         bounds_lat = np.linspace(bounds['sw']['lat'], bounds['ne']['lat'], num_chunks)
@@ -27,7 +29,8 @@ try:
                 sw = {"lat": latv[j][i], "lng": lngv[j][i]}
                 ne = {"lat": latv[j+1][i], "lng": lngv[j][i+1]}
                 chunked_bounds = {"ne": ne, "sw": sw}
-                chunks.append(chunked_bounds)
-        sys.stdout.write(str(chunks).replace("\'", "\"")) # Need to replace this so JavaScript can convert to JSON like object
+                SHPQuery(qid, county, chunked_bounds, maps_crs)
+                # chunks.append(chunked_bounds)
+        # sys.stdout.write(str(chunks).replace("\'", "\"")) # Need to replace this so JavaScript can convert to JSON like object
 except IndexError:
     print("Not enough arguments")
