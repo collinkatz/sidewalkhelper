@@ -22,17 +22,24 @@ class SHPQuery:
         self.bounding_box = gpd.GeoDataFrame({'geometry':[Point(bound_coords['ne']['lng'], bound_coords['ne']['lat']), Point(bound_coords['sw']['lng'], bound_coords['sw']['lat'])]}, index=["p1", "p2"], crs={"init":crs})
         # TODO: check if county exists in json and has data files - output error if not
         ctf_file_obj = open(county_to_file, 'r')
-        self.file_names = json.load(ctf_file_obj)[county]
+        ctf_file_json = json.load(ctf_file_obj)
+        self.file_names = ctf_file_json[county]["files"]
+        self.file_types = ctf_file_json[county]["types"]
         ctf_file_obj.close()
         self.county_directory = sidewalk_data_dir + county + "/"
         self.county_data_crs = self.get_crs_from_file(self.file_names[0])
         # print(self.county_data_crs)
         self.bounding_box = self.bounding_box.to_crs(self.county_data_crs)
         # print(self.bounding_box)
-        self.df = self.get_county_data().to_crs(crs)
+        self.dfs = [df.to_crs(crs) for df in self.get_county_data()]
         # TODO: Need to try to get around stdout limit
         # TODO: Make it so there is a max query size and it will fill in more as it goes
-        sys.stdout.write(self.df.to_json().replace(' ','')) # Write this to a stream like stdout
+        pd.set_option('display.max_columns', None)
+        for df in self.dfs:
+            if not df.empty:
+                # print(df)
+                sys.stdout.write(df.to_json().replace(' ','') + "\n") # Write this to a stream like stdout
+                time.sleep(1)
         # self.output_json = self.df.to_file(output_dir + str(query_id) + "_" + county + ".json", driver="GeoJSON")
         # print("query: " + query_id + "_" + county + " finished with status 0")
         # except:
@@ -45,7 +52,11 @@ class SHPQuery:
 
     def get_county_data(self):
         file_dfs = []
-        for file_name in self.file_names:
+        for i in range(len(self.file_names)):
+            file_name = self.file_names[i]
+            file_type = self.file_types[i]
             file_df = gpd.read_file(self.county_directory + file_name, bbox=self.bounding_box)
+            file_df["FEATURE"] = file_type # Assign the file name to id so that we have the name when converting to json
             file_dfs.append(file_df)
-        return pd.concat(file_dfs)
+        return file_dfs
+        # return pd.concat(file_dfs)
