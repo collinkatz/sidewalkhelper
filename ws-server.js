@@ -54,6 +54,7 @@ app.ws('/mapws', (ws, req) => {
   });
 
 });
+
 async function runScriptSendWS(command, args, ws) {
   var child = spawn(command, args);
 
@@ -62,6 +63,10 @@ async function runScriptSendWS(command, args, ws) {
   child.stdout.on("data", (data) => {
     console.log('stdout: ' + data);
     ws.send(data);
+  });
+
+  child.stderr.on("data", (data) => {
+    console.log('stderr: ' + data);
   });
 
   child.on('error', (err) => {
