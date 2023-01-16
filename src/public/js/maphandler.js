@@ -1,4 +1,4 @@
-var features = {};
+var features = [];
 var mapObj;
 
 async function initMap(county) { // Setup map and event listeners
@@ -12,6 +12,11 @@ async function initMap(county) { // Setup map and event listeners
     mapObj = map;
     google.maps.event.addListener(map, "idle", debounce(() => mapQuery(mapObj, true))) // Add listener for when map idles on page
 
+    map.data.addListener('click', function(event) {
+        map.data.revertStyle();
+        map.data.overrideStyle(event.feature, {strokeColor: 'red', fillColor: 'red'});
+    });
+     
 }
 
 // async function mapQuery(mapObj, bounded) {
@@ -47,7 +52,7 @@ const mapwsSocketUrl = 'ws://localhost:3000/mapws/'
 const mapSocket = new WebSocket(mapwsSocketUrl);
 
 mapSocket.onopen = () => {
-  console.log('Websocket Opened'); 
+  console.log('Websocket Opened');
 }
 
 mapSocket.onmessage = (message) => {
@@ -55,15 +60,21 @@ mapSocket.onmessage = (message) => {
     try {
         var responseGeoJSON = JSON.parse(message.data);
         console.log(responseGeoJSON);
-        features = mapObj.data.addGeoJson(responseGeoJSON);
+        mapObj.data.addGeoJson(responseGeoJSON);
 
         mapObj.data.setStyle((feature) => {
             var FEATURE = feature.getProperty('FEATURE');
             var color = "gray";
-            if (FEATURE == "sidewalks_minor") {
+            if (FEATURE == "small_sidewalk") {
                 color = "blue";
-            } else if (FEATURE == "TrailsLine") {
+            } else if (FEATURE == "trail") {
                 color = "green";
+            } else if (FEATURE == "large_sidewalk") {
+                color = "red";
+            } else if (FEATURE == "open_space") {
+                color = "white";
+            } else if (FEATURE == "misc_pathway") {
+                color = "orange";
             }
             return {
                 strokeColor: color,
@@ -86,6 +97,7 @@ async function mapQuery(bounded) {
     } else {
         console.log("Query--- All")
     }
+
     clearFeatures(features);
 
     mapSocket.send(JSON.stringify({
@@ -105,11 +117,9 @@ function debounce(func, timeout = 100){
     
 
 function clearFeatures(features) {
-    if (features.length != 0) {
-        for (var i = 0; i < features.length; i++) {
-            map.data.remove(features[i]);
-        }
-    }
+    map.data.forEach(function (feature) {
+        map.data.remove(feature);
+    });
 }
 
 async function mapBounds(mapObj) {
